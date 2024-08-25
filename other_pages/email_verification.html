@@ -10,7 +10,7 @@
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-        import { getAuth, applyActionCode } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -25,27 +25,51 @@
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // Extract the action code (oobCode) from the URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const oobCode = urlParams.get('oobCode');
+        // Function to handle email verification
+        async function verifyEmailWithToken(token) {
+            const docRef = doc(db, "email_verifications", token);
+            const docSnap = await getDoc(docRef);
 
-        if (oobCode) {
-            // Verify the email
-            applyActionCode(auth, oobCode)
-            .then(() => {
-                // Email address has been verified successfully
-                document.getElementById('status-message').innerText = "Your email has been verified successfully!";
-            })
-            .catch((error) => {
-                // Handle error
-                console.error("Error verifying email:", error);
-                document.getElementById('status-message').innerText = "There was an error verifying your email. Please try again later.";
-            });
-        } else {
-            document.getElementById('status-message').innerText = "Invalid or missing verification code.";
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                const now = new Date();
+
+                if (data.expiresAt.toDate() > now && !data.verified) {
+                    // Mark the email as verified
+                    await updateDoc(docRef, {
+                        verified: true,
+                    });
+
+                    // Update the user's Firestore document if necessary
+                    // const userDocRef = doc(db, "users", data.userId);
+                    // await updateDoc(userDocRef, {
+                    //     email_: true,
+                    // });
+
+                    document.getElementById('status-message').innerText = "Your email has been verified successfully!";
+                } else if (data.verified) {
+                    document.getElementById('status-message').innerText = "This email has already been verified.";
+                } else {
+                    document.getElementById('status-message').innerText = "The verification link has expired.";
+                }
+            } else {
+                document.getElementById('status-message').innerText = "Invalid verification token.";
+            }
         }
+
+        // On DOM content loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+
+            if (token) {
+                verifyEmailWithToken(token);
+            } else {
+                document.getElementById('status-message').innerText = "No verification token found.";
+            }
+        });
     </script>
 </head>
 <body>
