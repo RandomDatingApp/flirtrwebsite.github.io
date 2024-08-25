@@ -13,38 +13,40 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
 
     <script>
-        // Your web app's Firebase configuration
-        var firebaseConfig = {
-            apiKey: 'AIzaSyCPg8JnVkkiEehreIBRAYcM-cDUIULzY9k',
-            appId: '1:967068847950:web:bd4925bf477396a81f581f',
-            messagingSenderId: '967068847950',
-            projectId: 'dating-app-test-48edd',
-            authDomain: 'dating-app-test-48edd.firebaseapp.com',
-            storageBucket: 'dating-app-test-48edd.appspot.com',
-            measurementId: 'G-DRHSF42ESB',
-        };
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+        document.addEventListener('DOMContentLoaded', function () {
+            // Your web app's Firebase configuration
+            var firebaseConfig = {
+                apiKey: 'AIzaSyCPg8JnVkkiEehreIBRAYcM-cDUIULzY9k',
+                appId: '1:967068847950:web:bd4925bf477396a81f581f',
+                messagingSenderId: '967068847950',
+                projectId: 'dating-app-test-48edd',
+                authDomain: 'dating-app-test-48edd.firebaseapp.com',
+                storageBucket: 'dating-app-test-48edd.appspot.com',
+                measurementId: 'G-DRHSF42ESB',
+            };
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
 
-        // Extract the action code (oobCode) from the URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const oobCode = urlParams.get('oobCode');
+            // Extract the action code (oobCode) from the URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const oobCode = urlParams.get('oobCode');
 
-        if (oobCode) {
-            // Verify the email
-            firebase.auth().applyActionCode(oobCode)
-            .then(function() {
-                // Email address has been verified successfully
-                document.getElementById('status-message').innerText = "Your email has been verified successfully!";
-            })
-            .catch(function(error) {
-                // Handle error
-                console.error("Error verifying email:", error);
-                document.getElementById('status-message').innerText = "There was an error verifying your email. Please try again later.";
-            });
-        } else {
-            document.getElementById('status-message').innerText = "Invalid or missing verification code.";
-        }
+            if (oobCode) {
+                // Verify the email
+                firebase.auth().applyActionCode(oobCode)
+                .then(function() {
+                    // Email address has been verified successfully
+                    document.getElementById('status-message').innerText = "Your email has been verified successfully!";
+                })
+                .catch(function(error) {
+                    // Handle error
+                    console.error("Error verifying email:", error);
+                    document.getElementById('status-message').innerText = "There was an error verifying your email. Please try again later.";
+                });
+            } else {
+                document.getElementById('status-message').innerText = "Invalid or missing verification code.";
+            }
+        });
     </script>
 </head>
 <body>
