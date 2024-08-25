@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your existing stylesheet -->
+
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+
+    <!-- Add Firebase Authentication -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: 'AIzaSyCPg8JnVkkiEehreIBRAYcM-cDUIULzY9k',
+            appId: '1:967068847950:web:bd4925bf477396a81f581f',
+            messagingSenderId: '967068847950',
+            projectId: 'dating-app-test-48edd',
+            authDomain: 'dating-app-test-48edd.firebaseapp.com',
+            storageBucket: 'dating-app-test-48edd.appspot.com',
+            measurementId: 'G-DRHSF42ESB',
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Extract the action code (oobCode) from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const oobCode = urlParams.get('oobCode');
+
+        if (oobCode) {
+            // Verify the email
+            firebase.auth().applyActionCode(oobCode)
+            .then(function() {
+                // Email address has been verified successfully
+                document.getElementById('status-message').innerText = "Your email has been verified successfully!";
+            })
+            .catch(function(error) {
+                // Handle error
+                console.error("Error verifying email:", error);
+                document.getElementById('status-message').innerText = "There was an error verifying your email. Please try again later.";
+            });
+        } else {
+            document.getElementById('status-message').innerText = "Invalid or missing verification code.";
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Email Verification in Progress...</h1>
+        <p id="status-message">Please wait while we verify your email.</p>
+    </div>
+</body>
+</html>
