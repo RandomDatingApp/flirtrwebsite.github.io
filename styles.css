@@ -54,8 +54,8 @@ body, html {
 
 /* Phone frame */
 .phone-frame {
-    width: 323px;
-    height: 700px;
+    width: 277px;
+    height: 600px;
     background-size: cover;
     background-position: center;
     position: relative;
