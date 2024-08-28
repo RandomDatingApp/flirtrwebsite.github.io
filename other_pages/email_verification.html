@@ -6,11 +6,9 @@
     <title>Email Verification</title>
     <link rel="stylesheet" href="../styles.css"> <!-- Link to your existing stylesheet -->
 
-    <!-- Include the reCAPTCHA v3 API -->
-    <script src="https://www.google.com/recaptcha/api.js?render=your-site-key"></script>
-
     <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
     <script type="module">
+        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
         import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
@@ -55,12 +53,8 @@
             const token = urlParams.get('token');
 
             if (token) {
-                // Execute reCAPTCHA v3 on form submission
-                grecaptcha.ready(function() {
-                    grecaptcha.execute('6LcrzTAqAAAAAJm1ljbsTQlV_LidpKrWziB7WnOh', { action: 'verify_email' }).then(function(recaptchaToken) {
-                        console.log('reCAPTCHA token:', recaptchaToken);
-                        verifyEmailWithToken(token);
-                    });
+                document.getElementById('verify-button').addEventListener('click', () => {
+                    verifyEmailWithToken(token);
                 });
             } else {
                 document.getElementById('status-message').innerText = "No verification token found.";
@@ -71,7 +65,8 @@
 <body>
     <div class="container">
         <h1>Email Verification Required</h1>
-        <p id="status-message">Please wait while we verify your email...</p>
+        <p id="status-message">Please click the button below to verify your email.</p>
+        <button id="verify-button">Verify Email</button>
     </div>
 </body>
 </html>
