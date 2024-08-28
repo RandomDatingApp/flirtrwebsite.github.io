@@ -6,9 +6,11 @@
     <title>Email Verification</title>
     <link rel="stylesheet" href="../styles.css"> <!-- Link to your existing stylesheet -->
 
+    <!-- Include the reCAPTCHA v3 API -->
+    <script src="https://www.google.com/recaptcha/api.js?render=your-site-key"></script>
+
     <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
         import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
@@ -27,7 +29,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Function to handle email verification
         async function verifyEmailWithToken(token) {
             const docRef = doc(db, "email_verifications", token);
             const docSnap = await getDoc(docRef);
@@ -54,32 +55,23 @@
             const token = urlParams.get('token');
 
             if (token) {
-                document.getElementById('verify-button').addEventListener('click', () => {
-                    if (confirm("Do you want to verify your email?")) {
-                        const captchaResponse = grecaptcha.getResponse();
-                        if (captchaResponse.length === 0) {
-                            document.getElementById('status-message').innerText = "Please complete the CAPTCHA.";
-                        } else {
-                            verifyEmailWithToken(token);
-                        }
-                    } else {
-                        document.getElementById('status-message').innerText = "Email verification was canceled.";
-                    }
+                // Execute reCAPTCHA v3 on form submission
+                grecaptcha.ready(function() {
+                    grecaptcha.execute('6LcrzTAqAAAAAJm1ljbsTQlV_LidpKrWziB7WnOh', { action: 'verify_email' }).then(function(recaptchaToken) {
+                        console.log('reCAPTCHA token:', recaptchaToken);
+                        verifyEmailWithToken(token);
+                    });
                 });
             } else {
                 document.getElementById('status-message').innerText = "No verification token found.";
             }
         });
     </script>
-    <!-- Add Google reCAPTCHA -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
     <div class="container">
         <h1>Email Verification Required</h1>
-        <p id="status-message">Please click the button below to verify your email.</p>
-        <div class="g-recaptcha" data-sitekey="6LcrzTAqAAAAAJm1ljbsTQlV_LidpKrWziB7WnOh"></div> <!-- Replace 'your-site-key' with your reCAPTCHA site key -->
-        <button id="verify-button">Verify Email</button>
+        <p id="status-message">Please wait while we verify your email...</p>
     </div>
 </body>
 </html>
