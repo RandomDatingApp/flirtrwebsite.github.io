@@ -65,7 +65,11 @@
             const token = urlParams.get('token');
 
             if (token) {
-                verifyEmailWithToken(token);
+                if (confirm("Do you want to verify your email?")) {
+                    verifyEmailWithToken(token);
+                } else {
+                    document.getElementById('status-message').innerText = "Email verification was canceled.";
+                }
             } else {
                 document.getElementById('status-message').innerText = "No verification token found.";
             }
