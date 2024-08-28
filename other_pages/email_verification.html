@@ -37,17 +37,7 @@
                 const now = new Date();
 
                 if (data.expiresAt.toDate() > now && !data.verified) {
-                    // Mark the email as verified
-                    await updateDoc(docRef, {
-                        verified: true,
-                    });
-
-                    // Update the user's Firestore document if necessary
-                    // const userDocRef = doc(db, "users", data.userId);
-                    // await updateDoc(userDocRef, {
-                    //     email_: true,
-                    // });
-
+                    await updateDoc(docRef, { verified: true });
                     document.getElementById('status-message').innerText = "Your email has been verified successfully!";
                 } else if (data.verified) {
                     document.getElementById('status-message').innerText = "This email has already been verified.";
@@ -59,27 +49,37 @@
             }
         }
 
-        // On DOM content loaded
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
 
             if (token) {
-                if (confirm("Do you want to verify your email?")) {
-                    verifyEmailWithToken(token);
-                } else {
-                    document.getElementById('status-message').innerText = "Email verification was canceled.";
-                }
+                document.getElementById('verify-button').addEventListener('click', () => {
+                    if (confirm("Do you want to verify your email?")) {
+                        const captchaResponse = grecaptcha.getResponse();
+                        if (captchaResponse.length === 0) {
+                            document.getElementById('status-message').innerText = "Please complete the CAPTCHA.";
+                        } else {
+                            verifyEmailWithToken(token);
+                        }
+                    } else {
+                        document.getElementById('status-message').innerText = "Email verification was canceled.";
+                    }
+                });
             } else {
                 document.getElementById('status-message').innerText = "No verification token found.";
             }
         });
     </script>
+    <!-- Add Google reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
     <div class="container">
-        <h1>Email Verification in Progress...</h1>
-        <p id="status-message">Please wait while we verify your email.</p>
+        <h1>Email Verification Required</h1>
+        <p id="status-message">Please click the button below to verify your email.</p>
+        <div class="g-recaptcha" data-sitekey="your-site-key"></div> <!-- Replace 'your-site-key' with your reCAPTCHA site key -->
+        <button id="verify-button">Verify Email</button>
     </div>
 </body>
 </html>
